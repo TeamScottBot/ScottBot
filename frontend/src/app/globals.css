@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css?family=Inter");
 @import "tailwindcss";
 
 :root {
@@ -10,12 +11,19 @@
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
+
+	--color-scott-grey-100: #424242;
+	--color-scott-grey-200: #D9D9D9;
+	--color-scott-grey-300: #ADADAD;
+	--color-scott-red-100: #D4183D;
+
+	--font-agsm-main: "Inter", serif;
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
+		--background: #ffffff;
+		--foreground: #171717;
 	}
 }
 
