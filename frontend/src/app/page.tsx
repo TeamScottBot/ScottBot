@@ -1,7 +1,12 @@
-export default function Home() {
+import CustomerDashboard from "@/components/customer/customerDashboard";
+import RestarauntSelect from "@/components/customer/restarauntSelect";
+
+const Home = () => {
 	return (
 		<div className="bg-white text-black mx-auto">
-			Hello world!
+			<CustomerDashboard />
+			<RestarauntSelect />
 		</div>
 	);
-}
+};
+export default Home;

@@ -23,7 +23,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={inter.className}>
 				<ReactQueryClientProvider>
-				<header className="w-full border-b">
+				<header className="w-full">
 					<div className="mx-auto max-w-[436px] px-6">
 						<Navbar />
 					</div>
