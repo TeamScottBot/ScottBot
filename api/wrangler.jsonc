@@ -7,12 +7,27 @@
 	"name": "api",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-02-10",
+	"durable_objects": {
+    "bindings": [
+		{
+			"name": "ORDERS",
+			"class_name": "OrderDO"
+		}
+		]
+	},
 	"observability": {
 		"enabled": true
 	},
+	"migrations": [
+		{
+		"tag": "v1",
+		"new_classes": ["OrderDO"]
+		}
+	],
 	"compatibility_flags": [
 		"nodejs_compat"
 	]
+	
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -24,6 +39,8 @@
 	 * databases, object storage, AI inference, real-time communication and more.
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
+	
+	 
 	/**
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
