@@ -1,5 +1,10 @@
-import { DateTime, Str } from "chanfana";
-import type { Context } from "hono";
-import { z } from "zod";
+import { z } from "zod"
 
-//TODO: order schema etc.
+export const CreateOrderSchema = z.object({
+  status: z.string().default("test")
+})
+
+export type OrderState = {
+  id: string
+  status: string
+}

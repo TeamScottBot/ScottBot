@@ -1,20 +1,14 @@
-import { fromHono } from "chanfana";
-import { Hono } from "hono";
+import { Hono } from "hono"
+import { ordersRoutes } from "./routes/order"
+import { OrderDO } from "./durable-objects/orders"
 
-// Start a Hono app
-const app = new Hono<{ Bindings: Env }>();
+type Env = {
+  ORDERS: DurableObjectNamespace
+}
 
-// Setup OpenAPI registry
-const openapi = fromHono(app, {
-	docs_url: "/",
-});
+const app = new Hono<{ Bindings: Env }>()
 
-// Register OpenAPI endpoints
-//openapi.post("/api/orders", orders);
+app.route("/orders", ordersRoutes)
 
-
-// You may also register routes for non OpenAPI directly on Hono
-// app.get('/test', (c) => c.text('Hono!'))
-
-// Export the Hono app
-export default app;
+export default app
+export { OrderDO }
