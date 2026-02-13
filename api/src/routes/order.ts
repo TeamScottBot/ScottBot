@@ -1,7 +1,7 @@
 
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
-import { CreateOrderSchema } from "../types"
+import { OrderSchema } from "../types"
 
 type Env = {
   ORDERS: DurableObjectNamespace
@@ -11,7 +11,7 @@ export const ordersRoutes = new Hono<{ Bindings: Env }>()
 
 ordersRoutes.post(
   "/",
-  zValidator("json", CreateOrderSchema),
+  zValidator("json", OrderSchema),
   async (c) => {
     const body = c.req.valid("json")
     const id = crypto.randomUUID()
@@ -49,6 +49,31 @@ ordersRoutes.get("/:id/status", async (c) => {
 
   return res
 })
+
+ordersRoutes.post(
+  "/:id/update",
+  zValidator("json", OrderSchema),
+  async (c) => {
+    const id = c.req.param("id")
+    const body = c.req.valid("json")
+    const status = body.status
+
+    const stub = c.env.ORDERS.get(
+      c.env.ORDERS.idFromName(id)
+    )
+
+    const res = await stub.fetch("https://do/update", {
+      method: "POST",
+      body: JSON.stringify({ status })
+    })
+
+    if (!res.ok) {
+      return c.json({ error: "Order not found" }, 404)
+    }
+
+    return res
+  }
+)
 
 ordersRoutes.delete("/:id", async (c) => {
   const id = c.req.param("id")
