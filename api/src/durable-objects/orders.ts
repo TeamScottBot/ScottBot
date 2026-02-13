@@ -24,6 +24,17 @@ export class OrderDO {
       return Response.json(order)
     }
 
+    if (url.pathname === "/update") {
+      const { status } = await req.json<{ status: string }>()
+      const order = await this.state.storage.get<OrderState>("order")
+
+      if (!order) {
+        return new Response("not found", { status: 404 })
+      }
+      await this.state.storage.put("order", { ...order, status })
+      return Response.json({ ...order, status })
+    }
+
     if (url.pathname === "/delete") {
       const order = await this.state.storage.get<OrderState>("order")
       if (!order) {
