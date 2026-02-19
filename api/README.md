@@ -1,9 +1,68 @@
-# Cloudflare Workers OpenAPI 3.1
+# ScottBot API
 
-This is a Cloudflare Worker with OpenAPI 3.1 using [chanfana](https://github.com/cloudflare/chanfana) and [Hono](https://github.com/honojs/hono).
+This API is a Cloudflare Worker with OpenAPI 3.1 using [chanfana](https://github.com/cloudflare/chanfana) and [Hono](https://github.com/honojs/hono).
 
-This is an example project made to be used as a quick start into building OpenAPI compliant Workers that generates the
+This is built on an example project made to be used as a quick start into building OpenAPI compliant Workers that generates the
 `openapi.json` schema automatically from code and validates the incoming request to the defined parameters or request body.
+
+## API Documentation
+
+### Start Order
+
+Method: `POST`
+
+Route: `'/'`
+
+Body format:
+```
+{
+  "status": <"test", "moving_to_pickup", "waiting_for_pickup", "moving_to_dropoff", "waiting_for_dropoff" or "delivered">
+}
+```
+
+Returns: Json with order id as a string
+
+should be invoked when starting an order, body will eventually contain pickup and dropoff location when we determine format the robot needs for that information
+
+### Get Status
+
+Method: `GET`
+
+Route: `'/:id/status'`
+
+Returns: Json with status as a string
+
+should be invoked when checking an order's status from the frontend
+
+### Update Status
+
+Method: `POST`
+
+Route: `'/:id/update'`
+
+Body format:
+```
+{
+  "status": <"test", "moving_to_pickup", "waiting_for_pickup", "moving_to_dropoff", "waiting_for_dropoff" or "delivered">
+}
+```
+
+Returns: nothing
+
+should be invoked when updating an order's status
+
+### Complete Order
+
+Method: `DELETE`
+
+Route: `'/:id'`
+
+Returns: nothing
+
+should be invoked when an order is complete and can be deleted
+
+
+
 
 ## Get started
 
