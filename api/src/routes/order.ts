@@ -24,6 +24,8 @@ ordersRoutes.post(
       method: "POST",
       body: JSON.stringify({
         id,
+        pickupLocation: body.pickupLocation,
+        dropoffLocation: body.dropoffLocation,
         status: body.status ?? "test"
       })
     })
@@ -31,6 +33,21 @@ ordersRoutes.post(
     return c.json({ orderId: id })
   }
 )
+
+ordersRoutes.get("/:id/ws", async (c) => {
+  const id = c.req.param("id")
+
+  const stub = c.env.ORDERS.get(
+    c.env.ORDERS.idFromName(id)
+  )
+
+  const req = new Request("https://do/ws", {
+    method: "GET",
+    headers: c.req.raw.headers
+  })
+
+  return stub.fetch(req)
+})
 
 ordersRoutes.get("/:id/status", async (c) => {
   const id = c.req.param("id")
