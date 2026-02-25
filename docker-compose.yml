@@ -1,0 +1,18 @@
+services:
+  scottbot:
+    build: .
+    container_name: scottbot_ros2
+    network_mode: host          # Required for ROS 2 DDS discovery
+    volumes:
+      # Mount source for live editing — changes on host reflect in container
+      - ./ros2_ws/src:/ros2_ws/src
+    environment:
+      - ROS_DOMAIN_ID=0
+    # Uncomment below for real hardware (camera, LIDAR, serial, etc.)
+    # privileged: true
+    # devices:
+    #   - /dev/video0:/dev/video0
+    #   - /dev/ttyUSB0:/dev/ttyUSB0
+    stdin_open: true
+    tty: true
+    command: bash
