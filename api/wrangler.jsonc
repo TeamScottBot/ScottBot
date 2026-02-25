@@ -25,7 +25,8 @@
 		}
 	],
 	"compatibility_flags": [
-		"nodejs_compat"
+		"nodejs_compat",
+		"websocket"
 	]
 	
 	/**
