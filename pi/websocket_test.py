@@ -16,25 +16,32 @@ class OrderListener:
         """
         self.websocket_uri = websocket_uri
         self.is_connected = False
+        self.message_count = 0
 
     async def connect_and_listen(self):
         """Connect to the WebSocket and listen for order updates."""
         print(f"[{self._get_timestamp()}] Connecting to WebSocket: {self.websocket_uri}")
 
         try:
-            async with websockets.connect(self.websocket_uri) as websocket:
+            async with websockets.connect(self.websocket_uri, ping_interval=20, close_timeout=10) as websocket:
                 self.is_connected = True
                 print(f"[{self._get_timestamp()}] Connected to order server")
+                print(f"[{self._get_timestamp()}] Waiting for updates (send requests to the API)...\n")
 
                 async for message in websocket:
+                    self.message_count += 1
                     await self._handle_order_message(message)
 
         except websockets.exceptions.ConnectionClosed:
-            print(f"[{self._get_timestamp()}] Connection closed by server")
+            if self.message_count == 0:
+                print(f"[{self._get_timestamp()}] ⚠ Connection closed - no messages received")
+            else:
+                print(f"[{self._get_timestamp()}] ✗ Connection closed by server after {self.message_count} messages")
         except ConnectionRefusedError:
-            print(f"[{self._get_timestamp()}] Failed to connect: Connection refused")
+            print(f"[{self._get_timestamp()}] ✗ Failed to connect: Connection refused")
+            print(f"[{self._get_timestamp()}] Check if the API is running and the WebSocket URI is correct")
         except Exception as e:
-            print(f"[{self._get_timestamp()}] Error: {e}")
+            print(f"[{self._get_timestamp()}] ✗ Error: {type(e).__name__}: {e}")
         finally:
             self.is_connected = False
 
@@ -49,9 +56,9 @@ class OrderListener:
             data = json.loads(message)
             await self._process_order(data)
         except json.JSONDecodeError:
-            print(f"[{self._get_timestamp()}] ✗ Invalid JSON received: {message}")
+            print(f"[{self._get_timestamp()}] Invalid JSON received: {message}")
         except Exception as e:
-            print(f"[{self._get_timestamp()}] ✗ Error processing message: {e}")
+            print(f"[{self._get_timestamp()}] Error processing message: {e}")
 
     async def _process_order(self, order: dict):
         """
@@ -65,11 +72,11 @@ class OrderListener:
         dropoff = order.get("dropoffLocation", "unknown")
         status = order.get("status", "unknown")
 
-        print(f"\n[{self._get_timestamp()}] New Order Received")
+        print(f"\n[{self._get_timestamp()}] Message #{self.message_count}")
         print(f"  Order ID: {order_id}")
         print(f"  Status: {status}")
         print(f"  Pickup Location: {pickup}")
-        print(f"  Dropoff Location: {dropoff}")
+        print(f"  Dropoff Location: {dropoff}\n")
 
         await self._simulate_robot_action(order_id, pickup, dropoff)
 
@@ -98,41 +105,24 @@ async def main():
     if len(sys.argv) > 1:
         websocket_uri = sys.argv[1]
     else:
-        websocket_uri = "ws://localhost:8787/orders/default/ws"
+        websocket_uri = "ws://api.qhgill2.workers.dev/orders/default/ws"
 
     print("=" * 60)
-    print("ScottBot - Raspberry Pi Order Listener")
+    print("ScottBot - WebSocket Listener")
     print("=" * 60)
-    print(f"Server URI: {websocket_uri}")
-    print("Waiting for orders...\n")
+    print(f"WebSocket URI: {websocket_uri}")
+    print(f"\nRun this script first, then send API requests to:")
+    print(f"  POST /orders/default/start")
+    print(f"  POST /orders/default/update")
+    print(f"=" * 60 + "\n")
 
     listener = OrderListener(websocket_uri)
-    retry_count = 0
-    max_retries = 5
-    base_wait_time = 2
-
-    while True:
-        try:
-            await listener.connect_and_listen()
-            retry_count = 0  
-        except Exception as e:
-            retry_count += 1
-            if retry_count > max_retries:
-                print(
-                    f"[{listener._get_timestamp()}] Max retries exceeded. Exiting."
-                )
-                break
-
-            wait_time = base_wait_time * (2 ** (retry_count - 1))
-            print(
-                f"[{listener._get_timestamp()}] Reconnecting in {wait_time}s (attempt {retry_count}/{max_retries})"
-            )
-            await asyncio.sleep(wait_time)
+    await listener.connect_and_listen()
 
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\n[Ctrl+C] Shutting down")
+        print("\n\n[Interrupted] Shutting down")
         sys.exit(0)

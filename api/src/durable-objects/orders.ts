@@ -24,7 +24,6 @@ export class OrderDO {
     }
 
     if (url.pathname === "/init") {
-      // Initialize the durable object with idle status
       await this.state.storage.put("status", "idle")
       return new Response("ok")
     }
@@ -117,8 +116,9 @@ export class OrderDO {
     }
   }
 
-  // async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
-  // }
+  async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
+    // Echo messages back if needed, or handle them here
+  }
 
   async webSocketClose(ws: WebSocket) {
     this.clients.delete(ws)
