@@ -62,25 +62,7 @@ ordersRoutes.get("/:id/ws", async (c) => {
     c.env.ORDERS.idFromName(id)
   )
 
-  // Create a new request with the WebSocket upgrade headers
-  const headers = new Headers(c.req.raw.headers)
-  
-  const req = new Request("https://do/ws", {
-    method: "GET",
-    headers: headers
-  })
-
-  const res = await stub.fetch(req)
-  
-  // Ensure the response is properly returned with WebSocket
-  if (res.status === 101) {
-    return new Response(res.body, {
-      status: res.status,
-      statusText: res.statusText,
-      headers: res.headers,
-      webSocket: res.webSocket
-    })
-  }
+  const res = await stub.fetch(c.req.raw)
 
   return res
 })

@@ -105,7 +105,7 @@ async def main():
     if len(sys.argv) > 1:
         websocket_uri = sys.argv[1]
     else:
-        websocket_uri = "ws://api.qhgill2.workers.dev/orders/default/ws"
+        websocket_uri = "wss://api.qhgill2.workers.dev/orders/default/ws"
 
     print("=" * 60)
     print("ScottBot - WebSocket Listener")

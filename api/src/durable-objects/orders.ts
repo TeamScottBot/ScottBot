@@ -29,7 +29,6 @@ export class OrderDO {
     }
 
     if (url.pathname === "/start") {
-      // Start an order if the robot is idle
       const currentStatus = await this.state.storage.get<string>("status")
       if (currentStatus && currentStatus !== "idle") {
         return new Response("robot is not idle", { status: 400 })
