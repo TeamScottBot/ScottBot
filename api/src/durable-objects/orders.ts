@@ -24,13 +24,27 @@ export class OrderDO {
     }
 
     if (url.pathname === "/init") {
-      const { id, pickupLocation, dropoffLocation, status } = await req.json<OrderState>()
-      await this.state.storage.put("order", { id, pickupLocation, dropoffLocation, status })
+      // Initialize the durable object with idle status
+      await this.state.storage.put("status", "idle")
+      return new Response("ok")
+    }
+
+    if (url.pathname === "/start") {
+      // Start an order if the robot is idle
+      const currentStatus = await this.state.storage.get<string>("status")
+      if (currentStatus && currentStatus !== "idle") {
+        return new Response("robot is not idle", { status: 400 })
+      }
+
+      const { id, pickupLocation, dropoffLocation } = await req.json<OrderState>()
+      await this.state.storage.put("order", { id, pickupLocation, dropoffLocation })
+      await this.state.storage.put("status", "moving_to_pickup")
+
       const orderData = {
         orderId: id,
         pickupLocation,
         dropoffLocation,
-        status
+        status: "moving_to_pickup"
       }
       this.broadcastToClients(orderData)
 
@@ -38,11 +52,19 @@ export class OrderDO {
     }
 
     if (url.pathname === "/status") {
+      const status = await this.state.storage.get<string>("status")
       const order = await this.state.storage.get<OrderState>("order")
-      if (!order) {
-        return new Response("not found", { status: 404 })
+
+      if (status === "idle" || !order) {
+        return Response.json({ status: "idle" })
       }
-      return Response.json(order)
+
+      return Response.json({
+        id: order.id,
+        pickupLocation: order.pickupLocation,
+        dropoffLocation: order.dropoffLocation,
+        status
+      })
     }
 
     if (url.pathname === "/update") {
@@ -50,10 +72,10 @@ export class OrderDO {
       const order = await this.state.storage.get<OrderState>("order")
 
       if (!order) {
-        return new Response("not found", { status: 404 })
+        return new Response("no active order", { status: 404 })
       }
-      const updatedOrder = { ...order, status }
-      await this.state.storage.put("order", updatedOrder)
+
+      await this.state.storage.put("status", status)
 
       this.broadcastToClients({
         orderId: order.id,
@@ -62,14 +84,15 @@ export class OrderDO {
         status
       })
 
-      return Response.json(updatedOrder)
+      return Response.json({
+        id: order.id,
+        pickupLocation: order.pickupLocation,
+        dropoffLocation: order.dropoffLocation,
+        status
+      })
     }
 
     if (url.pathname === "/delete") {
-      const order = await this.state.storage.get<OrderState>("order")
-      if (!order) {
-        return new Response("not found", { status: 404 })
-      }
       await this.state.storage.deleteAll()
       return Response.json({ deleted: true })
     }
