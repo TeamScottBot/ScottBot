@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const CustomerDashboard = () => {
   return (
     <div className="flex flex-col mt-12 text-black font-semibold">
@@ -13,9 +15,14 @@ const CustomerDashboard = () => {
                 Habit Burger
             </button>
         </div>
-        <button className="flex bg-black w-23/24 h-18 mt-8 mb-12 items-center justify-center rounded-2xl text-white text-semibold text-2xl hover:bg-scott-grey-300 hover:text-black">
-            Place Order
-        </button>
+        <Link
+          href="activeOrder"
+          className="w-full"
+        >
+          <button className="flex bg-black w-23/24 h-18 mt-8 mb-12 items-center justify-center rounded-2xl text-white text-semibold text-2xl hover:bg-scott-grey-300 hover:text-black">
+              Place Order
+          </button>
+        </Link>
       </div>
     </div>
   );

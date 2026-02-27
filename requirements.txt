@@ -1,0 +1,11 @@
+# Numerical / scientific
+numpy>=1.24.0
+
+# Image processing
+Pillow>=10.0.0
+
+# LIDAR data visualization (optional, useful for debugging)
+matplotlib>=3.7.0
+
+# Testing
+pytest>=7.4.0
