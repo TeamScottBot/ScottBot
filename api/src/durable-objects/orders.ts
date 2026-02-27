@@ -1,8 +1,9 @@
 import { OrderState } from "../types"
 
+const WS_TAG = "order-client"
+
 export class OrderDO {
   state: DurableObjectState
-  clients: Set<WebSocket> = new Set()
 
   constructor(state: DurableObjectState) {
     this.state = state
@@ -10,16 +11,20 @@ export class OrderDO {
 
   async fetch(req: Request) {
     const url = new URL(req.url)
-    if (url.pathname === "/ws") {
+    // Accept both /ws (when worker rewrites URL) and .../ws (when worker forwards original request)
+    if (url.pathname === "/ws" || url.pathname.endsWith("/ws")) {
       const pair = new WebSocketPair()
-      const client = pair[1]
+      const [client, server] = [pair[0], pair[1]]
 
-      this.state.acceptWebSocket(client)
-      this.clients.add(client)
+      // Tag so we can retrieve connections via getWebSockets() after hibernation
+      this.state.acceptWebSocket(server, [WS_TAG])
+
+      // Send welcome so the client gets a message immediately and confirms the pipe works
+      server.send(JSON.stringify({ type: "connected", message: "Order server ready" }))
 
       return new Response(null, {
         status: 101,
-        webSocket: pair[0]
+        webSocket: client
       })
     }
 
@@ -100,30 +105,26 @@ export class OrderDO {
 
   private broadcastToClients(data: unknown) {
     const message = JSON.stringify(data)
-    const deadClients = []
-
-    for (const client of this.clients) {
+    // Use getWebSockets() so we see connections after hibernation; in-memory Set is lost when DO is evicted
+    const clients = this.state.getWebSockets(WS_TAG)
+    for (const ws of clients) {
       try {
-        client.send(message)
-      } catch (error) {
-        deadClients.push(client)
+        ws.send(message)
+      } catch {
+        // Runtime will remove closed sockets from getWebSockets()
       }
     }
-
-    for (const client of deadClients) {
-      this.clients.delete(client)
-    }
   }
 
-  async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
-    // Echo messages back if needed, or handle them here
+  async webSocketMessage(_ws: WebSocket, _message: ArrayBuffer | string) {
+    // Optional: handle incoming messages from Pi
   }
 
-  async webSocketClose(ws: WebSocket) {
-    this.clients.delete(ws)
+  async webSocketClose(_ws: WebSocket) {
+    // No-op; runtime removes from getWebSockets() when closed
   }
 
-  async webSocketError(ws: WebSocket) {
-    this.clients.delete(ws)
+  async webSocketError(_ws: WebSocket) {
+    // No-op; runtime removes from getWebSockets() when closed
   }
 }

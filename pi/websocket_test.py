@@ -67,6 +67,12 @@ class OrderListener:
         Args:
             order: Dictionary containing orderId, pickupLocation, dropoffLocation, and status
         """
+        # Server sends a welcome message when the WebSocket is accepted
+        if order.get("type") == "connected":
+            print(f"\n[{self._get_timestamp()}] Message #{self.message_count} (server ready)")
+            print(f"  {order.get('message', 'Connected')}\n")
+            return
+
         order_id = order.get("orderId", "unknown")
         pickup = order.get("pickupLocation", "unknown")
         dropoff = order.get("dropoffLocation", "unknown")

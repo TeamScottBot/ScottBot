@@ -56,14 +56,21 @@ ordersRoutes.post(
 )
 
 ordersRoutes.get("/:id/ws", async (c) => {
+  // Cloudflare pattern: validate WebSocket upgrade, then forward original request to DO.
+  // See https://developers.cloudflare.com/durable-objects/examples/websocket-server/
+  const upgrade = c.req.header("Upgrade")
+  if (!upgrade || upgrade.toLowerCase() !== "websocket") {
+    return c.text("Expected Upgrade: websocket", 426)
+  }
+  if (c.req.method !== "GET") {
+    return c.text("Expected GET", 400)
+  }
+
   const id = c.req.param("id")
+  const stub = c.env.ORDERS.get(c.env.ORDERS.idFromName(id))
 
-  const stub = c.env.ORDERS.get(
-    c.env.ORDERS.idFromName(id)
-  )
-
+  // Forward the original request so the DO receives the real upgrade request.
   const res = await stub.fetch(c.req.raw)
-
   return res
 })
 
