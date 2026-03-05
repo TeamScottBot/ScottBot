@@ -11,26 +11,68 @@ export const ordersRoutes = new Hono<{ Bindings: Env }>()
 
 ordersRoutes.post(
   "/",
-  zValidator("json", OrderSchema),
   async (c) => {
-    const body = c.req.valid("json")
-    const id = crypto.randomUUID()
+    const id = "default"
 
     const stub = c.env.ORDERS.get(
       c.env.ORDERS.idFromName(id)
     )
 
     await stub.fetch("https://do/init", {
+      method: "POST"
+    })
+
+    return c.json({ robotId: id })
+  }
+)
+
+ordersRoutes.post(
+  "/:id/start",
+  zValidator("json", OrderSchema),
+  async (c) => {
+    const robotId = c.req.param("id")
+    const body = c.req.valid("json")
+
+    const stub = c.env.ORDERS.get(
+      c.env.ORDERS.idFromName(robotId)
+    )
+
+    const orderId = crypto.randomUUID()
+    const res = await stub.fetch("https://do/start", {
       method: "POST",
       body: JSON.stringify({
-        id,
-        status: body.status ?? "test"
+        id: orderId,
+        pickupLocation: body.pickupLocation,
+        dropoffLocation: body.dropoffLocation
       })
     })
 
-    return c.json({ orderId: id })
+    if (!res.ok) {
+      return c.json({ error: await res.text() }, 400)
+    }
+
+    return c.json({ orderId })
   }
 )
+
+ordersRoutes.get("/:id/ws", async (c) => {
+  // Cloudflare pattern: validate WebSocket upgrade, then forward original request to DO.
+  // See https://developers.cloudflare.com/durable-objects/examples/websocket-server/
+  const upgrade = c.req.header("Upgrade")
+  if (!upgrade || upgrade.toLowerCase() !== "websocket") {
+    return c.text("Expected Upgrade: websocket", 426)
+  }
+  if (c.req.method !== "GET") {
+    return c.text("Expected GET", 400)
+  }
+
+  const id = c.req.param("id")
+  const stub = c.env.ORDERS.get(c.env.ORDERS.idFromName(id))
+
+  // Forward the original request so the DO receives the real upgrade request.
+  const res = await stub.fetch(c.req.raw)
+  return res
+})
 
 ordersRoutes.get("/:id/status", async (c) => {
   const id = c.req.param("id")
