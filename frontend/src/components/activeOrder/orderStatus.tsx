@@ -16,7 +16,7 @@ const statusLabel: Record<string, string> = {
 const OrderStatus = () => {
   const [wsStatus, setWsStatus] = useState<{ status: string; dropoffLocation?: string } | null>(null);
 
-  const { data, refetch } = useQuery({
+  const { data } = useQuery({
     queryKey: ["orderStatus", ROBOT_ID],
     queryFn: () => getOrderStatus(ROBOT_ID),
     refetchInterval: 5000,
@@ -45,8 +45,9 @@ const OrderStatus = () => {
   const dropoff =
     display && "dropoffLocation" in display && display.dropoffLocation
       ? display.dropoffLocation
-      : "Winston Chung";
+      : null;
   const label = statusLabel[status] ?? "Order in Progress";
+  const isIdle = status === "idle";
 
   return (
     <div className="flex flex-col mt-8 text-black font-semibold">
@@ -59,9 +60,16 @@ const OrderStatus = () => {
                 <div className="text-black ml-4">
                 {label}
                 </div>
-                <div className="text-scott-grey-300 text-right mr-4">
-                Delivering to: <br />{dropoff}
-                </div>
+                {!isIdle && dropoff && (
+                  <div className="text-scott-grey-300 text-right mr-4">
+                  Delivering to: <br />{dropoff}
+                  </div>
+                )}
+                {isIdle && (
+                  <div className="text-scott-grey-300 text-right mr-4">
+                  No active order
+                  </div>
+                )}
             </div>
             </div>
         </div>

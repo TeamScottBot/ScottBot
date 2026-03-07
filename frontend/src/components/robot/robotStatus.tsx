@@ -23,8 +23,9 @@ const RobotStatus = () => {
   const dropoff =
     data && "dropoffLocation" in data && data.dropoffLocation
       ? data.dropoffLocation
-      : "Winston Chung";
+      : null;
   const label = statusLabel[status] ?? "Order in Progress";
+  const isIdle = status === "idle";
 
   return (
     <div className="flex flex-col mt-8 text-black font-semibold">
@@ -37,9 +38,15 @@ const RobotStatus = () => {
                 <div className="text-black ml-4">
                 {label}
                 </div>
-                <div className="text-scott-grey-300 text-right mr-4">
-                Delivering to: <br />{dropoff}
-                </div>
+                {!isIdle && dropoff ? (
+                  <div className="text-scott-grey-300 text-right mr-4">
+                  Delivering to: <br />{dropoff}
+                  </div>
+                ) : (
+                  <div className="text-scott-grey-300 text-right mr-4">
+                  {isIdle ? "No active order" : "—"}
+                  </div>
+                )}
             </div>
             </div>
         </div>

@@ -18,8 +18,8 @@ const VendorActiveOrder = () => {
   });
 
   const hasOrder = data && "id" in data && data.status !== "idle";
-  const customer = hasOrder && "dropoffLocation" in data ? data.dropoffLocation : "Cade";
-  const restaurant = hasOrder && "pickupLocation" in data ? data.pickupLocation : "Panda Express";
+  const customer = hasOrder && "dropoffLocation" in data ? data.dropoffLocation : null;
+  const restaurant = hasOrder && "pickupLocation" in data ? data.pickupLocation : null;
 
   return (
     <div className="flex flex-col mt-8 text-black font-semibold">
@@ -28,6 +28,7 @@ const VendorActiveOrder = () => {
             <div className="mt-4 ml-4 text-left text-lg">
                 Active Order
             </div>
+            {hasOrder && customer != null && restaurant != null ? (
             <div className="flex bg-white w-11/12 h-18 my-4 items-center justify-start rounded-2xl text-black text-sm mx-auto">
                 <div className="text-black ml-4">
                     {customer}
@@ -36,6 +37,11 @@ const VendorActiveOrder = () => {
                     {restaurant}
                 </div>
             </div>
+            ) : (
+            <div className="flex bg-white w-11/12 h-18 my-4 items-center justify-center rounded-2xl text-scott-grey-300 text-sm mx-auto">
+                No active order
+            </div>
+            )}
             <button
               type="button"
               className="flex bg-black w-11/12 h-18 mb-4 items-center justify-center rounded-2xl text-white font-semibold text-xl hover:bg-scott-grey-300 hover:text-black mx-auto disabled:opacity-70"
