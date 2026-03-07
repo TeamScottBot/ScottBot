@@ -1,4 +1,4 @@
-FROM ros:humble
+FROM --platform=linux/amd64 ros:humble
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -9,6 +9,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-nav2-bringup \
     ros-humble-slam-toolbox \
     ros-humble-navigation2 \
+    # Gazebo simulation
+    ros-humble-gazebo-ros-pkgs \
+    ros-humble-gazebo-ros2-control \
+    ros-humble-xacro \
+    ros-humble-robot-state-publisher \
+    ros-humble-joint-state-publisher \
+    ros-humble-rviz2 \
+    # noVNC display stack (for GUI in browser on macOS)
+    xvfb \
+    x11vnc \
+    novnc \
+    websockify \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies

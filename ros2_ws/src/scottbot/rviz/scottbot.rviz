@@ -1,0 +1,115 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+
+Visualization Manager:
+  Class: ""
+  Displays:
+    # Robot model from /robot_description
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Depth: 5
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+      Update Interval: 0
+      Visual Enabled: true
+      Collision Enabled: false
+
+    # TF frames
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Frame Timeout: 15
+      Update Interval: 0
+
+    # LIDAR laser scan
+    - Class: rviz_default_plugins/LaserScan
+      Name: LaserScan
+      Enabled: true
+      Topic:
+        Value: /scan
+        Depth: 5
+        Durability Policy: Volatile
+        Reliability Policy: Best Effort
+      Size (m): 0.03
+      Color Transformer: Intensity
+      Decay Time: 0
+      Style: Flat Squares
+
+    # Camera image
+    - Class: rviz_default_plugins/Image
+      Name: Camera
+      Enabled: true
+      Topic:
+        Value: /camera/image_raw
+        Depth: 5
+        Durability Policy: Volatile
+        Reliability Policy: Best Effort
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Normalize Range: true
+
+    # Odometry arrows
+    - Class: rviz_default_plugins/Odometry
+      Name: Odometry
+      Enabled: true
+      Topic:
+        Value: /odom
+        Depth: 5
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Keep: 50
+      Shape:
+        Value: Arrow
+      Position Tolerance: 0.1
+      Angle Tolerance: 0.1
+
+    # Grid for spatial reference
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Count: 20
+      Cell Size: 1
+      Color: 160; 160; 164
+      Line Style:
+        Value: Lines
+      Normal Cell Count: 0
+      Plane: XY
+      Plane Cell Count: 10
+
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: odom
+    Frame Rate: 30
+
+  Name: root
+
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/Measure
+
+  Views:
+    Current:
+      Class: rviz_default_plugins/ThirdPersonFollower
+      Name: ThirdPersonFollower
+      Distance: 4.0
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Pitch: 0.5
+      Yaw: 0.5
+      Target Frame: base_link
