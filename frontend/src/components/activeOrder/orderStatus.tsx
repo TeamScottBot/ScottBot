@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ROBOT_ID, getOrderStatus, getOrderWebSocketUrl } from "@/lib/api";
+import { ROBOT_ID, getOrderStatus, getOrderWebSocketUrl } from "../../lib/api";
 import { useEffect, useState } from "react";
 
 const statusLabel: Record<string, string> = {

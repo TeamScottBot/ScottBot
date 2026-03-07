@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ROBOT_ID, initRobot, startOrder } from "@/lib/api";
+import { ROBOT_ID, initRobot, startOrder } from "../../lib/api";
 
 const CUSTOMER_LOCATION = "Winston Chung";
 

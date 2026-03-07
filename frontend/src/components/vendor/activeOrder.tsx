@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ROBOT_ID, getOrderStatus, updateOrderStatus } from "@/lib/api";
+import { ROBOT_ID, getOrderStatus, updateOrderStatus } from "../../lib/api";
 
 const VendorActiveOrder = () => {
   const queryClient = useQueryClient();
