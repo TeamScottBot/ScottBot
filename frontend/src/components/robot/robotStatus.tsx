@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ROBOT_ID, getOrderStatus } from "../../lib/api";
+import { ROBOT_ID, getOrderStatus } from "../../app/api-client";
 
 const statusLabel: Record<string, string> = {
   idle: "Idle",
