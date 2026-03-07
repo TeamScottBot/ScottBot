@@ -3,10 +3,12 @@ import { usePathname } from "next/navigation";
 import { IoPerson } from "react-icons/io5";
 import { GiKnifeFork } from "react-icons/gi";
 import { RiRobot2Line } from "react-icons/ri";
+import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import Link from "next/link";
 
 const items = [
   { name: "Customer", link: "/", icon: IoPerson },
+  { name: "Active Order", link: "/activeOrder", icon: HiOutlineClipboardDocumentList },
   { name: "Vendor", link: "/vendor", icon: GiKnifeFork },
   { name: "Robot Control", link: "/robot", icon: RiRobot2Line },
 ];
