@@ -19,7 +19,7 @@ const OrderStatus = () => {
   const { data } = useQuery({
     queryKey: ["orderStatus", ROBOT_ID],
     queryFn: () => getOrderStatus(ROBOT_ID),
-    refetchInterval: 5000,
+    refetchInterval: 15000,
   });
 
   useEffect(() => {
