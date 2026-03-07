@@ -19,7 +19,6 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     pkg_dir = get_package_share_directory('scottbot')
 
-    # --- Launch arguments ------------------------------------------------- #
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     world = LaunchConfiguration(
         'world',
@@ -38,7 +37,6 @@ def generate_launch_description():
         description='Path to Gazebo world file',
     )
 
-    # --- Robot description (xacro → URDF string) ------------------------- #
     xacro_file = os.path.join(pkg_dir, 'urdf', 'scottbot.urdf.xacro')
     robot_description = ParameterValue(
         Command(['xacro ', xacro_file]),
@@ -55,7 +53,6 @@ def generate_launch_description():
         }],
     )
 
-    # --- Gazebo ----------------------------------------------------------- #
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -80,14 +77,12 @@ def generate_launch_description():
         output='screen',
     )
 
-    # --- Joint state publisher (GUI optional) ----------------------------- #
     joint_state_publisher = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
         parameters=[{'use_sim_time': use_sim_time}],
     )
 
-    # --- RViz2 (launch with rviz:=true) ----------------------------------- #
     use_rviz = LaunchConfiguration('rviz', default='false')
     declare_rviz = DeclareLaunchArgument(
         'rviz',
@@ -106,7 +101,6 @@ def generate_launch_description():
         condition=IfCondition(use_rviz),
     )
 
-    # --------------------------------------------------------------------- #
     return LaunchDescription([
         declare_use_sim_time,
         declare_world,
