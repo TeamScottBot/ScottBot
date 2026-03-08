@@ -1,0 +1,12 @@
+
+sudo chmod 777 /dev/ttyUSB1
+sudo chmod 777 /dev/ttyUSB0
+ls /dev/ttyUSB*
+
+docker run -it --rm   --name rplidar_container   --privileged   --net=host   --device=/dev/ttyUSB1   -v /tmp/.X11-unix:/tmp/.X11-unix   -e DISPLAY=$DISPLAY   my_rplidar_env
+
+
+ros2 launch sllidar_ros2 sllidar_a1_launch.py serial_port:=/dev/ttyUSB1 serial_baudrate:=115200
+
+
+docker exec -it rplidar_container bash

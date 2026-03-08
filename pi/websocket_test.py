@@ -7,19 +7,11 @@ from datetime import datetime
 
 class OrderListener:
     def __init__(self, websocket_uri: str):
-        """
-        Initialize the order listener.
-
-        Args:
-            websocket_uri: The URI of the Durable Object WebSocket endpoint
-                          (e.g., "ws://localhost:8787/orders/{order_id}/ws")
-        """
         self.websocket_uri = websocket_uri
         self.is_connected = False
         self.message_count = 0
 
     async def connect_and_listen(self):
-        """Connect to the WebSocket and listen for order updates."""
         print(f"[{self._get_timestamp()}] Connecting to WebSocket: {self.websocket_uri}")
 
         try:
@@ -34,24 +26,18 @@ class OrderListener:
 
         except websockets.exceptions.ConnectionClosed:
             if self.message_count == 0:
-                print(f"[{self._get_timestamp()}] ⚠ Connection closed - no messages received")
+                print(f"[{self._get_timestamp()}] Connection closed - no messages received")
             else:
-                print(f"[{self._get_timestamp()}] ✗ Connection closed by server after {self.message_count} messages")
+                print(f"[{self._get_timestamp()}] Connection closed by server after {self.message_count} messages")
         except ConnectionRefusedError:
-            print(f"[{self._get_timestamp()}] ✗ Failed to connect: Connection refused")
+            print(f"[{self._get_timestamp()}] Failed to connect: Connection refused")
             print(f"[{self._get_timestamp()}] Check if the API is running and the WebSocket URI is correct")
         except Exception as e:
-            print(f"[{self._get_timestamp()}] ✗ Error: {type(e).__name__}: {e}")
+            print(f"[{self._get_timestamp()}] Error: {type(e).__name__}: {e}")
         finally:
             self.is_connected = False
 
     async def _handle_order_message(self, message: str):
-        """
-        Handle an incoming order message.
-
-        Args:
-            message: JSON string containing order data
-        """
         try:
             data = json.loads(message)
             await self._process_order(data)
@@ -61,13 +47,6 @@ class OrderListener:
             print(f"[{self._get_timestamp()}] Error processing message: {e}")
 
     async def _process_order(self, order: dict):
-        """
-        Process an order and extract delivery locations.
-
-        Args:
-            order: Dictionary containing orderId, pickupLocation, dropoffLocation, and status
-        """
-        # Server sends a welcome message when the WebSocket is accepted
         if order.get("type") == "connected":
             print(f"\n[{self._get_timestamp()}] Message #{self.message_count} (server ready)")
             print(f"  {order.get('message', 'Connected')}\n")
@@ -86,28 +65,18 @@ class OrderListener:
 
         await self._simulate_robot_action(order_id, pickup, dropoff)
 
+    # Simulate robot actions for delivery. Replace this with actual robot control logic.
     async def _simulate_robot_action(self, order_id: str, pickup: str, dropoff: str):
-        """
-        Simulate robot actions for delivery.
-        Replace this with actual robot control logic.
 
-        Args:
-            order_id: The order identifier
-            pickup: Pickup location
-            dropoff: Dropoff location
-        """
         print(f"Robot received order {order_id}")
         print(f"Preparing to navigate to pickup: {pickup}")
 
     @staticmethod
     def _get_timestamp() -> str:
-        """Get current timestamp for logging."""
         return datetime.now().strftime("%H:%M:%S")
 
 
 async def main():
-    """Main entry point for the WebSocket listener."""
-
     if len(sys.argv) > 1:
         websocket_uri = sys.argv[1]
     else:
