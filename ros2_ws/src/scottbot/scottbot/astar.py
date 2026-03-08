@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import heapq
 import math
+import os
 import yaml
 from typing import Dict, List, Optional, Tuple
 
@@ -202,11 +203,12 @@ def grid_to_world(
     cell: Cell,
     resolution: float,
     origin: Tuple[float, float] = (0.0, 0.0),
+    grid_height: int = 0,
 ) -> Tuple[float, float]:
-    # (row, col) -> (x, y) in metres. Point is at the center of the cell.
+    # (row, col) -> (x, y) in metres
     row, col = cell
     x = origin[0] + (col + 0.5) * resolution
-    y = origin[1] - (row + 0.5) * resolution
+    y = origin[1] + (grid_height - row - 0.5) * resolution
     return (x, y)
 
 
@@ -214,21 +216,72 @@ def world_to_grid(
     point: Tuple[float, float],
     resolution: float,
     origin: Tuple[float, float] = (0.0, 0.0),
+    grid_height: int = 0,
 ) -> Cell:
-    # (x, y) in metres -> nearest (row, col)
     col = int((point[0] - origin[0]) / resolution)
-    row = int((origin[1] - point[1]) / resolution)
+    row = grid_height - 1 - int((point[1] - origin[1]) / resolution)
     return (row, col)
 
-
+# load a map YAML. ROS standard or custom embedded grid
 def load_map(filepath: str) -> dict:
-    # load a YAML map file
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
 
-    for key in ("grid", "resolution"):
-        if key not in data:
-            raise KeyError(f"Map YAML is missing required key: '{key}'")
+    if "image" in data:
+        return _load_image_map(filepath, data)
 
-    data.setdefault("origin", [0.0, 0.0])
-    return data
+    if "grid" in data:
+        data.setdefault("origin", [0.0, 0.0])
+        data["grid_height"] = len(data["grid"])
+        return data
+
+    raise KeyError("Map YAML must have either an 'image' or 'grid' key")
+
+
+def _load_image_map(yaml_path: str, data: dict) -> dict:
+    try:
+        import cv2
+    except ImportError:
+        raise ImportError(
+        )
+
+    image_path = data["image"]
+    if not os.path.isabs(image_path):
+        image_path = os.path.join(os.path.dirname(yaml_path), image_path)
+
+    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        raise FileNotFoundError(f"Could not read map image: {image_path}")
+
+    resolution = data["resolution"]
+    origin = list(data.get("origin", [0.0, 0.0, 0.0]))[:2]
+    negate = data.get("negate", 0)
+    occupied_thresh = data.get("occupied_thresh", 0.65)
+    free_thresh = data.get("free_thresh", 0.25)
+
+    # convert pixel brightness to occupancy (0 = free, 1 = wall)
+    img_f = img.astype(float)
+    if negate:
+        occ = img_f / 255.0
+    else:
+        occ = (255.0 - img_f) / 255.0
+
+    rows, cols = img.shape
+    grid: List[List[int]] = []
+    for r in range(rows):
+        row: List[int] = []
+        for c in range(cols):
+            if occ[r, c] < free_thresh:
+                # free
+                row.append(0)
+            else:
+                # occupied or unknown
+                row.append(1)
+        grid.append(row)
+
+    return {
+        "grid": grid,
+        "resolution": resolution,
+        "origin": origin,
+        "grid_height": rows,
+    }

@@ -16,6 +16,7 @@ from std_msgs.msg import Empty, String
 from scottbot.astar import (
     astar,
     grid_to_world,
+    world_to_grid,
     inflate_grid,
     load_map,
     path_to_commands,
@@ -80,6 +81,7 @@ class AStarPlannerNode(Node):
         grid = map_data["grid"]
         resolution = map_data["resolution"]
         origin = tuple(map_data["origin"])
+        grid_height = map_data["grid_height"]
         cell_size = cell_override if cell_override > 0 else resolution
         rows = len(grid)
         cols = len(grid[0]) if rows else 0
@@ -123,7 +125,7 @@ class AStarPlannerNode(Node):
         for cell in simplify_path(path):
             ps = PoseStamped()
             ps.header = path_msg.header
-            wx, wy = grid_to_world(cell, resolution, origin)
+            wx, wy = grid_to_world(cell, resolution, origin, grid_height)
             ps.pose.position.x = wx
             ps.pose.position.y = wy
             path_msg.poses.append(ps)
