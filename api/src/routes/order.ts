@@ -117,6 +117,16 @@ ordersRoutes.post(
   }
 )
 
+ordersRoutes.post("/:id/emergency-stop", async (c) => {
+  const id = c.req.param("id")
+  const stub = c.env.ORDERS.get(c.env.ORDERS.idFromName(id))
+  const res = await stub.fetch("https://do/emergency-stop", { method: "POST" })
+  if (!res.ok) {
+    return c.json({ error: "Order service unavailable" }, 502)
+  }
+  return c.json({ ok: true })
+})
+
 ordersRoutes.delete("/:id", async (c) => {
   const id = c.req.param("id")
 

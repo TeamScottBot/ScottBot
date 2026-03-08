@@ -60,6 +60,14 @@ export async function updateOrderStatus(
   return res.json();
 }
 
+export async function emergencyStop(robotId: string): Promise<{ ok: boolean }> {
+  const res = await fetch(`${API_BASE}/orders/${robotId}/emergency-stop`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error("Failed to send emergency stop");
+  return res.json();
+}
+
 export async function deleteOrder(robotId: string): Promise<{ ok: boolean }> {
   const res = await fetch(`${API_BASE}/orders/${robotId}`, {
     method: "DELETE",
