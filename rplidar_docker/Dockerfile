@@ -5,6 +5,11 @@ RUN apt-get update && apt-get install -y \
     nano \
     python3-colcon-common-extensions \
     ros-humble-desktop \
+    ros-humble-slam-toolbox \
+    ros-humble-navigation2 \
+    ros-humble-nav2-bringup \
+    ros-humble-robot-state-publisher \
+    ros-humble-tf2-ros \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y python3-pip && rm -rf /var/lib/apt/lists/*
