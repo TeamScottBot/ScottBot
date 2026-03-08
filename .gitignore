@@ -2,6 +2,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Next.js
+.next/
+
 *.so
 
 .Python
