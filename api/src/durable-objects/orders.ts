@@ -95,8 +95,22 @@ export class OrderDO {
       })
     }
 
+    if (url.pathname === "/emergency-stop") {
+      this.broadcastToClients({ type: "emergency_stop" })
+      return Response.json({ ok: true })
+    }
+
     if (url.pathname === "/delete") {
+      const order = await this.state.storage.get<OrderState>("order")
       await this.state.storage.deleteAll()
+
+      this.broadcastToClients({
+        orderId: order?.id ?? "unknown",
+        pickupLocation: order?.pickupLocation ?? "unknown",
+        dropoffLocation: order?.dropoffLocation ?? "unknown",
+        status: "idle"
+      })
+
       return Response.json({ deleted: true })
     }
 

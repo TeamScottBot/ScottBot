@@ -52,6 +52,12 @@ class OrderListener:
             print(f"  {order.get('message', 'Connected')}\n")
             return
 
+        if order.get("type") == "emergency_stop":
+            print(f"\n[{self._get_timestamp()}] Message #{self.message_count} (EMERGENCY STOP)")
+            print("  Robot should stop immediately.\n")
+            await self._handle_emergency_stop()
+            return
+
         order_id = order.get("orderId", "unknown")
         pickup = order.get("pickupLocation", "unknown")
         dropoff = order.get("dropoffLocation", "unknown")
@@ -71,6 +77,10 @@ class OrderListener:
         print(f"Robot received order {order_id}")
         print(f"Preparing to navigate to pickup: {pickup}")
 
+    # Replace with actual robot stop logic (e.g. publish to ROS / stop motors).
+    async def _handle_emergency_stop(self):
+        print("Emergency stop received - robot should stop immediately.")
+
     @staticmethod
     def _get_timestamp() -> str:
         return datetime.now().strftime("%H:%M:%S")
@@ -89,6 +99,7 @@ async def main():
     print(f"\nRun this script first, then send API requests to:")
     print(f"  POST /orders/default/start")
     print(f"  POST /orders/default/update")
+    print(f"  POST /orders/default/emergency-stop")
     print(f"=" * 60 + "\n")
 
     listener = OrderListener(websocket_uri)
