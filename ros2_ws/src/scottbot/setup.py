@@ -26,6 +26,7 @@ setup(
             'obstacle_detector_node = scottbot.obstacle_detector_node:main',
             'motor_controller_node = scottbot.motor_controller_node:main',
             'lidar_node = scottbot.lidar_node:main',
+            'lidar_reader = scottbot.lidar_reader:main',
         ],
     },
 )
