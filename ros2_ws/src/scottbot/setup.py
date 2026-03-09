@@ -15,6 +15,7 @@ setup(
         (os.path.join('share', package_name, 'urdf'), glob('urdf/*')),
         (os.path.join('share', package_name, 'worlds'), glob('worlds/*')),
         (os.path.join('share', package_name, 'rviz'), glob('rviz/*')),
+        (os.path.join('share', package_name, 'maps'), glob('maps/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -30,6 +31,7 @@ setup(
             'motor_controller_node = scottbot.motor_controller_node:main',
             'lidar_node = scottbot.lidar_node:main',
             'lidar_reader = scottbot.lidar_reader:main',
+            'astar_planner = scottbot.astar_planner_node:main',
         ],
     },
 )
