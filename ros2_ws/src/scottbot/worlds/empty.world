@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+  Empty Gazebo world with a ground plane and sun.
+  Use as default for ScottBot simulation testing.
+-->
+<sdf version="1.6">
+  <world name="default">
+
+    <!-- Sunlight -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Physics (ODE, real-time factor ≈ 1.0) -->
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <!-- Initial camera viewpoint -->
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose>3.0 -3.0 3.0 0 0.5 2.35</pose>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

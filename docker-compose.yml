@@ -1,13 +1,20 @@
 services:
   scottbot:
     build: .
+    platform: linux/amd64
     container_name: scottbot_ros2
-    network_mode: host          # Required for ROS 2 DDS discovery
+    # network_mode: host        # Use on Linux for ROS 2 DDS discovery
+    ports:
+      - "6080:6080"             # noVNC (RViz2 in browser)
+      - "5900:5900"             # VNC direct
     volumes:
       # Mount source for live editing — changes on host reflect in container
       - ./ros2_ws/src:/ros2_ws/src
     environment:
       - ROS_DOMAIN_ID=0
+      - DISPLAY=:1
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - QT_X11_NO_MITSHM=1
     # Uncomment below for real hardware (camera, LIDAR, serial, etc.)
     # privileged: true
     # devices:
