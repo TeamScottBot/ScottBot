@@ -1,7 +1,3 @@
-# ROS 2 node that runs A* on a YAML map and publishes the path + commands
-# publishes:  /planned_path (Path)  and  /nav_commands (JSON string)
-# listens to: /replan (Empty) to re-run planning
-
 from __future__ import annotations
 
 import json
@@ -23,21 +19,19 @@ from scottbot.astar import (
     simplify_path,
 )
 
-
+# ROS 2 node that runs A* on a YAML map and publishes the path and commands
 class AStarPlannerNode(Node):
 
     def __init__(self) -> None:
         super().__init__("astar_planner_node")
 
-        # params — set these when you launch the node
         self.declare_parameter("map_file", "")
         self.declare_parameter("start", [0, 0])
         self.declare_parameter("goal", [0, 0])
         self.declare_parameter("robot_radius_cells", 2)
         self.declare_parameter("initial_heading_deg", 90.0)
-        self.declare_parameter("cell_size_override", 0.0)  # 0 = use map's resolution
+        self.declare_parameter("cell_size_override", 0.0)
 
-        # latched so if another node subscribes late it still gets the last msg
         latched_qos = QoSProfile(
             depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL
         )
@@ -52,7 +46,7 @@ class AStarPlannerNode(Node):
         # publish Empty to /replan to trigger a new plan
         self.create_subscription(Empty, "/replan", self._on_replan, 10)
 
-        # plan immediately on startup
+        # plan immediately on start
         self._plan()
 
     def _on_replan(self, _msg: Empty) -> None:
