@@ -16,6 +16,7 @@ setup(
         (os.path.join('share', package_name, 'worlds'), glob('worlds/*')),
         (os.path.join('share', package_name, 'rviz'), glob('rviz/*')),
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml') + glob('config/*.xml')),
+        (os.path.join('share', package_name, 'maps'), glob('maps/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -33,6 +34,7 @@ setup(
             'lidar_reader = scottbot.lidar_reader:main',
             'odom_node = scottbot.odom_node:main',
             'delivery_node = scottbot.delivery_node:main',
+            'astar_planner = scottbot.astar_planner_node:main',
         ],
     },
 )
