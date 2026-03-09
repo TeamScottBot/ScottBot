@@ -7,30 +7,57 @@ This is built on an example project made to be used as a quick start into buildi
 
 ## API Documentation
 
+All routes are under the `/orders` base path.
+
+### Init Robot
+
+Method: `POST`
+
+Route: `'/orders/'`
+
+Body: none
+
+Returns: Json with `robotId` as a string (e.g. `"default"`)
+
+should be invoked to initialize the robot's order state before use
+
 ### Start Order
 
 Method: `POST`
 
-Route: `'/'`
+Route: `'/orders/:id/start'`
 
 Body format:
 ```
 {
-  "status": <"test", "moving_to_pickup", "waiting_for_pickup", "moving_to_dropoff", "waiting_for_dropoff" or "delivered">
+  "pickupLocation": <string>,
+  "dropoffLocation": <string>
 }
 ```
 
-Returns: Json with order id as a string
+Returns: Json with `orderId` as a string (UUID). Returns 400 if the robot is not idle.
 
-should be invoked when starting an order, body will eventually contain pickup and dropoff location when we determine format the robot needs for that information
+should be invoked when starting an order for the given robot id; the order begins in status `moving_to_pickup`
+
+### WebSocket (order updates)
+
+Method: `GET`
+
+Route: `'/orders/:id/ws'`
+
+Headers: `Upgrade: websocket` required
+
+Returns: WebSocket connection; server sends real-time order updates (e.g. status changes, emergency stop) as JSON messages
+
+should be used when the client (e.g. Pi or frontend) needs to receive live order state and events
 
 ### Get Status
 
 Method: `GET`
 
-Route: `'/:id/status'`
+Route: `'/orders/:id/status'`
 
-Returns: Json with status as a string
+Returns: When idle: Json with `status` as `"idle"`. When an order is active: Json with `id`, `pickupLocation`, `dropoffLocation`, and `status`. Returns 404 if order not found.
 
 should be invoked when checking an order's status from the frontend
 
@@ -38,26 +65,38 @@ should be invoked when checking an order's status from the frontend
 
 Method: `POST`
 
-Route: `'/:id/update'`
+Route: `'/orders/:id/update'`
 
 Body format:
 ```
 {
-  "status": <"test", "moving_to_pickup", "waiting_for_pickup", "moving_to_dropoff", "waiting_for_dropoff" or "delivered">
+  "status": <"idle", "moving_to_pickup", "waiting_for_pickup", "moving_to_dropoff", "waiting_for_dropoff" or "delivered">
 }
 ```
 
-Returns: nothing
+Returns: Json with `id`, `pickupLocation`, `dropoffLocation`, and `status`. Returns 404 if order not found.
 
 should be invoked when updating an order's status
+
+### Emergency Stop
+
+Method: `POST`
+
+Route: `'/orders/:id/emergency-stop'`
+
+Body: none
+
+Returns: Json with `ok: true`. Returns 502 if order service unavailable.
+
+should be invoked when triggering an emergency stop for the robot
 
 ### Complete Order
 
 Method: `DELETE`
 
-Route: `'/:id'`
+Route: `'/orders/:id'`
 
-Returns: nothing
+Returns: Json with `ok: true` and `orderId`. Returns 404 if order not found.
 
 should be invoked when an order is complete and can be deleted
 
