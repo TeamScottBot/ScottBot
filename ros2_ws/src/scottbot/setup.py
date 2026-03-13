@@ -35,6 +35,7 @@ setup(
             'odom_node = scottbot.odom_node:main',
             'delivery_node = scottbot.delivery_node:main',
             'astar_planner = scottbot.astar_planner_node:main',
+            'nav_executor = scottbot.nav_executor_node:main',
         ],
     },
 )

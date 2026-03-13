@@ -101,7 +101,7 @@ class AStarPlannerNode(Node):
 
         self.get_logger().info(f"Path found: {len(path)} cells")
 
-        # convert path to TURN/FORWARD commands
+        # convert full path to TURN/FORWARD commands
         commands = path_to_commands(
             path, cell_size=cell_size, initial_heading=heading
         )
